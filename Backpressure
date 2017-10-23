@@ -1,0 +1,6 @@
+http://blog.csdn.net/jdsjlzx/article/details/54845517
+
+onBackpressureBuffer是不丢弃数据的处理方式。把上游收到的全部缓存下来，等下游来请求再发给下游。相当于一个水库。但上游太快，水库（buffer）就会溢出。
+onBackpressureDrop和onBackpressureLatest比较类似，都会丢弃数据。这两种策略相当于一种令牌机制（或者配额机制），下游通过request请求产生令牌（配额）给上游，上游接到多少令牌，就给下游发送多少数据。
+当令牌数消耗到0的时候，上游开始丢弃数据。但这两种策略在令牌数为0的时候有一点微妙的区别：onBackpressureDrop直接丢弃数据，不缓存任何数据；
+而onBackpressureLatest则缓存最新的一条数据，这样当上游接到新令牌的时候，它就先把缓存的上一条“最新”数据发送给下游。可以结合下面两幅图来理解。

@@ -1,0 +1,46 @@
+Disposable简介及使用
+下面我们另一个重要的概念Disposable。当Observer(观察者)与Observable(被观察者)通过subscribe()建立连接后，事件可以进行传递。当发生一些其他情况，不得不断开两者之间的连接时，该怎么操作?这个时候就该Disposable上场了。
+
+Disposable简介
+
+Disposable在RxJava中,用它来切断Observer(观察者)与Observable(被观察者)之间的连接，当调用它的dispose()方法时, 它就会将Observer(观察者)与Observable(被观察者)之间的连接切断, 从而导致Observer(观察者)收不到事件。
+
+Disposable对象如何获得？
+
+Disposable的作用是切断连接，确切地讲是将Observer(观察者)切断，不再接收来自被观察者的事件，而被观察者的事件却仍在继续执行。
+
+因此Disposable的对象通过观察者获得，具体分为两种方式。
+
+Disposable对象的获得
+
+1.Observer接口
+
+
+通过创建Observer接口,当订阅后，建立与Observable的联系，onSubscribe(Disposable d)中便可以获得Disposable对象。
+
+2.Observable对象subscribe方法
+
+
+当subscribe()后直接返回一个Disposable 对象，获得了Disposable对象后，我们便可以调用dispose()方法，在恰当的时机，断开连接，停止接收Observable(被观察者)发送的事件。
+
+注意：当切断被观察者与观察者之间的联系，Observable(被观察者)的事件却仍在继续执行。
+
+另外，补充一下onNext()、onComplete()和onError()事件的发送规则。
+
+具体规则：
+
+Observable(被观察者)可以发送无限个onNext, Observer(观察者)也可以接收无限个onNext.
+
+当Observable(被观察者)发送了一个onComplete后, Observable(被观察者)中onComplete之后的事件将会继续发送, 而Observer(观察者)收到onComplete事件之后将不再继续接收事件.
+
+当Observable(被观察者)发送了一个onError后, Observable(被观察者)中onError之后的事件将继续发送, 而Observer(观察者)收到onError事件之后将不再继续接收事件.
+
+Observable(被观察者)可以不发送onComplete或onError.
+
+最为关键的是onComplete和onError必须唯一并且互斥, 即不能发多个onComplete, 也不能发多个onError, 也不能先发一个onComplete, 然后再发一个onError, 反之亦然
+
+注:关于onComplete和onError唯一并且互斥这一点, 是需要自行在代码中进行控制, 如果你的代码逻辑中违背了这个规则, 并不一定会导致程序崩溃. 比如发送多个onComplete是可以正常运行的, 依然是收到第一个onComplete就不再接收了, 但若是发送多个onError, 则收到第二个onError事件会导致程序会崩溃。
+
+
+链接：
+http://www.jianshu.com/p/3d3a2210db0a
